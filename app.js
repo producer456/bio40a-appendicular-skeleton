@@ -133,6 +133,11 @@ const IMAGE_DATA = {
             'Proximal phalanx', 'Middle phalanx', 'Distal phalanx'
         ]
     },
+    lab_packet: {
+        pdf: 'lab_packet.pdf',
+        title: 'Week 5 Lab Packet (PDF)',
+        words: []
+    },
     terms_list: {
         pdf: 'terms_list.pdf',
         title: 'Week 5 Terms List (PDF)',
@@ -521,18 +526,22 @@ function applyPdfMode() {
     const pdfMode = isPdfTab();
     const imgContainer = document.getElementById('image-container');
     const pdfContainer = document.getElementById('pdf-container');
+    const viewport = document.getElementById('image-viewport');
     const sidebar = document.querySelector('.sidebar');
     const zoomCtrls = document.querySelector('.zoom-controls');
     const pdfFrame = document.getElementById('pdf-frame');
+    const pdfDownload = document.getElementById('pdf-download');
 
     imgContainer.style.display = pdfMode ? 'none' : '';
     pdfContainer.style.display = pdfMode ? '' : 'none';
+    if (viewport) viewport.classList.toggle('pdf-mode', pdfMode);
     if (sidebar) sidebar.style.display = pdfMode ? 'none' : '';
     if (zoomCtrls) zoomCtrls.style.display = pdfMode ? 'none' : '';
 
     if (pdfMode) {
         const src = IMAGE_DATA[currentImage].pdf;
         if (pdfFrame.getAttribute('src') !== src) pdfFrame.setAttribute('src', src);
+        if (pdfDownload) pdfDownload.setAttribute('href', src);
     } else {
         if (pdfFrame.getAttribute('src')) pdfFrame.setAttribute('src', '');
     }

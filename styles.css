@@ -150,6 +150,11 @@ main {
     box-shadow: 0 4px 20px rgba(12, 45, 72, 0.12);
 }
 
+/* When showing a PDF, give the viewport enough vertical space for a full page */
+.image-viewport.pdf-mode {
+    min-height: calc(100vh - 200px);
+}
+
 .image-container {
     position: relative;
     transform-origin: 0 0;
