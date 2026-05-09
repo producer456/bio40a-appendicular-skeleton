@@ -21,9 +21,8 @@ const TARSALS = [
     'Cuboid'
 ];
 
-// "Right"/"Left" included on starred bones — students place a marker
-// tagged with the side to answer the "siding" question from the lab packet.
-const SIDE_RL = ['Right', 'Left'];
+// Tabs with `siding: true` get a separate "Right or Left?" picker
+// (not a marker) — answers the lab packet's "Is this a right or left?" question.
 
 const IMAGE_DATA = {
     pectoral_girdle: {
@@ -34,8 +33,8 @@ const IMAGE_DATA = {
     scapula: {
         src: 'images/scapula.jpg',
         title: 'Scapula ★ (siding)',
+        siding: true,
         words: [
-            ...SIDE_RL,
             'Scapula',
             'Superior border', 'Lateral (axillary) border', 'Medial (vertebral) border',
             'Spine', 'Supraspinous fossa', 'Infraspinous fossa',
@@ -45,8 +44,8 @@ const IMAGE_DATA = {
     humerus: {
         src: 'images/humerus.jpg',
         title: 'Humerus ★ (siding)',
+        siding: true,
         words: [
-            ...SIDE_RL,
             'Humerus',
             'Head', 'Anatomical neck', 'Surgical neck',
             'Greater tubercle', 'Lesser tubercle', 'Intertubercular sulcus',
@@ -90,8 +89,8 @@ const IMAGE_DATA = {
     os_coxae: {
         src: 'images/os_coxae.jpg',
         title: 'Os Coxae ★ (siding)',
+        siding: true,
         words: [
-            ...SIDE_RL,
             'Ilium', 'Ischium', 'Pubis',
             ...ILIUM, ...ISCHIUM,
             'Pubic symphysis',
@@ -101,8 +100,8 @@ const IMAGE_DATA = {
     femur: {
         src: 'images/femur.jpg',
         title: 'Femur ★ (siding)',
+        siding: true,
         words: [
-            ...SIDE_RL,
             'Femur',
             'Head', 'Neck', 'Greater trochanter', 'Lesser trochanter',
             'Linea aspera', 'Shaft/Body',
@@ -114,8 +113,8 @@ const IMAGE_DATA = {
     tibia_fibula: {
         src: 'images/tibia_fibula.jpg',
         title: 'Tibia & Fibula ★ (siding)',
+        siding: true,
         words: [
-            ...SIDE_RL,
             'Patella', 'Tibia', 'Fibula',
             'Medial condyle of tibia', 'Lateral condyle of tibia',
             'Intercondylar eminence', 'Tibial tuberosity',
@@ -152,6 +151,11 @@ let answerKeys = {};
 let markerIdCounter = 0;
 let draggedWord = null;
 
+// Siding state — per-image 'Right' | 'Left' | null
+let sidings = {};       // current selection (teacher's WIP, or student's answer)
+let sidingKeys = {};    // teacher-saved correct answers
+let teacherSidings = {}; // saved teacher selection while in student mode
+
 // Separate storage for teacher's in-progress work (FIX #1)
 let teacherMarkers = {};
 
@@ -182,10 +186,13 @@ let pinchStartZoom = 1;
 function init() {
     loadAnswerKeys();
     loadMarkers();
+    loadSidings();
     setupTabs();
+    setupSidingButtons();
     renderImage();
     renderWordBank();
     renderMarkers();
+    renderSiding();
     setupImageClick();
     setupDragAndDrop();
     setupTouchDrag();
@@ -463,6 +470,7 @@ function setMode(mode) {
         // Save teacher's current work before switching
         teacherMarkers[currentImage] = markers[currentImage] ?
             JSON.parse(JSON.stringify(markers[currentImage])) : [];
+        teacherSidings[currentImage] = sidings[currentImage] || null;
 
         // Load answer key positions for student
         const key = answerKeys[currentImage];
@@ -479,12 +487,19 @@ function setMode(mode) {
         } else {
             markers[currentImage] = [];
         }
+        // Student starts with no siding selected
+        sidings[currentImage] = null;
         saveMarkers();
+        saveSidings();
     } else {
         // Restore teacher's work when switching back
         if (teacherMarkers[currentImage] && teacherMarkers[currentImage].length > 0) {
             markers[currentImage] = JSON.parse(JSON.stringify(teacherMarkers[currentImage]));
             saveMarkers();
+        }
+        if (teacherSidings[currentImage]) {
+            sidings[currentImage] = teacherSidings[currentImage];
+            saveSidings();
         }
     }
 
@@ -520,6 +535,11 @@ function renderAll() {
     renderWordBank();
     renderMarkers();
     renderLines();
+    renderSiding();
+}
+
+function isSidingTab() {
+    return !!IMAGE_DATA[currentImage] && !!IMAGE_DATA[currentImage].siding;
 }
 
 function applyPdfMode() {
@@ -901,6 +921,73 @@ function findMarker(id) {
     return (markers[currentImage] || []).find(m => m.id === id);
 }
 
+// ---- Siding ----
+function setupSidingButtons() {
+    document.querySelectorAll('.side-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!isSidingTab()) return;
+            const side = btn.dataset.side;
+            sidings[currentImage] = (sidings[currentImage] === side) ? null : side;
+            saveSidings();
+            renderSiding();
+        });
+    });
+}
+
+function renderSiding() {
+    const box = document.getElementById('siding-question');
+    if (!box) return;
+    const showBox = isSidingTab() && !isPdfTab();
+    box.style.display = showBox ? '' : 'none';
+    if (!showBox) return;
+
+    const selected = sidings[currentImage] || null;
+    document.querySelectorAll('.side-btn').forEach(btn => {
+        btn.classList.remove('selected', 'side-correct', 'side-incorrect');
+        if (btn.dataset.side === selected) btn.classList.add('selected');
+    });
+
+    const prompt = document.getElementById('siding-prompt');
+    if (currentMode === 'student') {
+        const hasKey = !!sidingKeys[currentImage];
+        prompt.textContent = hasKey
+            ? 'Is this a right or left bone?'
+            : 'No answer key yet — switch to Teacher Mode to set one.';
+    } else {
+        prompt.textContent = 'Is this a right or left bone?';
+    }
+}
+
+function applySidingResult(result) {
+    // result: 'correct' | 'incorrect' | null
+    const selected = sidings[currentImage] || null;
+    document.querySelectorAll('.side-btn').forEach(btn => {
+        btn.classList.remove('selected', 'side-correct', 'side-incorrect');
+        if (btn.dataset.side === selected) {
+            btn.classList.add(result === 'correct' ? 'side-correct' : 'side-incorrect');
+        }
+    });
+}
+
+function saveSidings() {
+    try {
+        localStorage.setItem('bio40a_appendicular_sidings', JSON.stringify(sidings));
+    } catch(e) {}
+}
+function loadSidings() {
+    try {
+        const a = localStorage.getItem('bio40a_appendicular_sidings');
+        if (a) sidings = JSON.parse(a);
+        const b = localStorage.getItem('bio40a_appendicular_sidingKeys');
+        if (b) sidingKeys = JSON.parse(b);
+    } catch(e) {}
+}
+function saveSidingKeys() {
+    try {
+        localStorage.setItem('bio40a_appendicular_sidingKeys', JSON.stringify(sidingKeys));
+    } catch(e) {}
+}
+
 // ---- Tap-to-select word ----
 function selectWord(word) {
     clearSelectedWord();
@@ -1144,9 +1231,21 @@ function saveAnswerKey() {
         return;
     }
 
+    if (isSidingTab() && !sidings[currentImage]) {
+        showToast('Pick Right or Left for the siding question first', 'error');
+        return;
+    }
+
     answerKeys[currentImage] = JSON.parse(JSON.stringify(m));
     localStorage.setItem('bio40a_appendicular_answerKeys', JSON.stringify(answerKeys));
-    showToast(`Answer key saved for "${IMAGE_DATA[currentImage].title}" (${m.length} items)`, 'success');
+
+    if (isSidingTab()) {
+        sidingKeys[currentImage] = sidings[currentImage];
+        saveSidingKeys();
+    }
+
+    const sideTxt = isSidingTab() ? `, side: ${sidings[currentImage]}` : '';
+    showToast(`Answer key saved for "${IMAGE_DATA[currentImage].title}" (${m.length} items${sideTxt})`, 'success');
 }
 
 function loadAnswerKeys() {
@@ -1164,7 +1263,9 @@ function exportData() {
         exportedAt: new Date().toISOString(),
         bio40a_appendicular_markers: localStorage.getItem('bio40a_appendicular_markers'),
         bio40a_appendicular_markerCounter: localStorage.getItem('bio40a_appendicular_markerCounter'),
-        bio40a_appendicular_answerKeys: localStorage.getItem('bio40a_appendicular_answerKeys')
+        bio40a_appendicular_answerKeys: localStorage.getItem('bio40a_appendicular_answerKeys'),
+        bio40a_appendicular_sidings: localStorage.getItem('bio40a_appendicular_sidings'),
+        bio40a_appendicular_sidingKeys: localStorage.getItem('bio40a_appendicular_sidingKeys')
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1198,6 +1299,8 @@ function importData(event) {
             if (payload.bio40a_appendicular_markers != null) localStorage.setItem('bio40a_appendicular_markers', payload.bio40a_appendicular_markers);
             if (payload.bio40a_appendicular_markerCounter != null) localStorage.setItem('bio40a_appendicular_markerCounter', payload.bio40a_appendicular_markerCounter);
             if (payload.bio40a_appendicular_answerKeys != null) localStorage.setItem('bio40a_appendicular_answerKeys', payload.bio40a_appendicular_answerKeys);
+            if (payload.bio40a_appendicular_sidings != null) localStorage.setItem('bio40a_appendicular_sidings', payload.bio40a_appendicular_sidings);
+            if (payload.bio40a_appendicular_sidingKeys != null) localStorage.setItem('bio40a_appendicular_sidingKeys', payload.bio40a_appendicular_sidingKeys);
             showToast('Import successful — reloading…', 'success');
             setTimeout(() => location.reload(), 800);
         } catch (err) {
@@ -1239,7 +1342,27 @@ function submitAnswers() {
         }
     });
 
+    // Grade the siding question if this tab has one and a key exists
+    let sidingResult = null;
+    if (isSidingTab() && sidingKeys[currentImage]) {
+        total += 1;
+        const studentSide = sidings[currentImage] || null;
+        const correctSide = sidingKeys[currentImage];
+        if (studentSide === correctSide) {
+            sidingResult = 'correct';
+            correct++;
+        } else {
+            sidingResult = 'incorrect';
+            wrongItems.push({
+                marker: 'Siding',
+                yours: studentSide || '(empty)',
+                correct: correctSide
+            });
+        }
+    }
+
     renderAll();
+    if (sidingResult) applySidingResult(sidingResult);
 
     const pct = Math.round((correct / total) * 100);
     const scoreClass = pct === 100 ? 'perfect' : pct >= 70 ? 'good' : 'poor';
@@ -1252,8 +1375,9 @@ function submitAnswers() {
     if (wrongItems.length > 0) {
         html += `<div class="detail" style="margin-bottom:8px;">Incorrect answers:</div>`;
         wrongItems.forEach(w => {
+            const label = (typeof w.marker === 'number') ? `#${w.marker}` : w.marker;
             html += `<div class="wrong-item">
-                #${w.marker}: You said <strong>${w.yours}</strong><br>
+                ${label}: You said <strong>${w.yours}</strong><br>
                 Correct: <strong>${w.correct}</strong>
             </div>`;
         });
@@ -1282,6 +1406,11 @@ function resetCurrent() {
                 resultClass: null
             }));
         }
+    }
+
+    if (isSidingTab()) {
+        sidings[currentImage] = null;
+        saveSidings();
     }
 
     saveMarkers();

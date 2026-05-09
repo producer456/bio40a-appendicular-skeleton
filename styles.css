@@ -205,6 +205,62 @@ main {
 
 .tab-pdf { font-style: italic; }
 
+/* ---- Siding Question ---- */
+.siding-question {
+    background: white;
+    border: 2px solid var(--sand-dark);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 10px rgba(12, 45, 72, 0.08);
+}
+.siding-question h3 {
+    color: var(--ocean-deep);
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+.siding-question p {
+    font-size: 13px;
+    color: var(--text-mid);
+    margin-bottom: 10px;
+}
+.siding-toggle {
+    display: flex;
+    gap: 8px;
+}
+.side-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--sand-dark);
+    border-radius: 10px;
+    background: var(--sand-light);
+    color: var(--text-dark);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.side-btn:hover {
+    background: white;
+    border-color: var(--ocean-light);
+}
+.side-btn.selected {
+    background: var(--ocean-light);
+    color: white;
+    border-color: var(--ocean-deep);
+}
+.side-btn.side-correct {
+    background: var(--kelp-green);
+    color: white;
+    border-color: var(--kelp-green);
+}
+.side-btn.side-incorrect {
+    background: var(--coral);
+    color: white;
+    border-color: var(--coral);
+}
+
 /* Zoom controls */
 .zoom-controls {
     position: absolute;
