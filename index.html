@@ -18,25 +18,16 @@
     </header>
 
     <nav class="image-tabs">
-        <button class="tab active" data-image="scapula_right">Scapula R</button>
-        <button class="tab" data-image="scapula_left">Scapula L</button>
-        <button class="tab" data-image="clavicle">Clavicle</button>
-        <button class="tab" data-image="humerus_anterior_right">Humerus R · Ant</button>
-        <button class="tab" data-image="humerus_anterior_left">Humerus L · Ant</button>
-        <button class="tab" data-image="humerus_posterior_right">Humerus R · Post</button>
-        <button class="tab" data-image="humerus_posterior_left">Humerus L · Post</button>
+        <button class="tab active" data-image="pectoral_girdle">Pectoral Girdle</button>
+        <button class="tab" data-image="scapula">Scapula ★</button>
+        <button class="tab" data-image="humerus">Humerus ★</button>
         <button class="tab" data-image="radius_ulna">Radius & Ulna</button>
-        <button class="tab" data-image="wrist_hand">Wrist & Hand</button>
-        <button class="tab" data-image="os_coxae_right">Os Coxae R</button>
-        <button class="tab" data-image="os_coxae_left">Os Coxae L</button>
-        <button class="tab" data-image="pelvis_articulated">Pelvis (Artic.)</button>
-        <button class="tab" data-image="femur_anterior_right">Femur R · Ant</button>
-        <button class="tab" data-image="femur_anterior_left">Femur L · Ant</button>
-        <button class="tab" data-image="femur_posterior_right">Femur R · Post</button>
-        <button class="tab" data-image="femur_posterior_left">Femur L · Post</button>
-        <button class="tab" data-image="tibia_fibula_right">Tibia/Fib R</button>
-        <button class="tab" data-image="tibia_fibula_left">Tibia/Fib L</button>
-        <button class="tab" data-image="ankle_foot">Ankle & Foot</button>
+        <button class="tab" data-image="hand">Hand</button>
+        <button class="tab" data-image="pelvis_articulated">Pelvis</button>
+        <button class="tab" data-image="os_coxae">Os Coxae ★</button>
+        <button class="tab" data-image="femur">Femur ★</button>
+        <button class="tab" data-image="tibia_fibula">Tibia & Fibula ★</button>
+        <button class="tab" data-image="foot">Foot</button>
         <button class="tab tab-pdf" data-image="terms_list">📄 Terms List</button>
     </nav>
 
@@ -50,7 +41,7 @@
                     <button class="zoom-btn zoom-fit" onclick="zoomReset()" title="Fit to view">Fit</button>
                 </div>
                 <div class="image-container" id="image-container">
-                    <img id="main-image" src="images/scapula_right.jpg" alt="Lab image" draggable="false">
+                    <img id="main-image" src="images/pectoral_girdle.jpg" alt="Lab image" draggable="false">
                     <svg id="lines-layer" xmlns="http://www.w3.org/2000/svg"></svg>
                     <div id="markers-layer"></div>
                 </div>
@@ -65,9 +56,10 @@
                     <h3>Teacher Mode</h3>
                     <p>1. Tap the image to place a marker<br>
                        2. Drag a term onto the marker (or tap term, then tap marker)<br>
-                       3. Tap X to remove a marker<br>
-                       4. Use +/- or pinch to zoom, drag to pan<br>
-                       5. Save when done</p>
+                       3. ★ tabs include "Right"/"Left" — tag any marker to answer the siding question<br>
+                       4. Tap X to remove a marker<br>
+                       5. Use +/- or pinch to zoom, drag to pan<br>
+                       6. Save when done</p>
                 </div>
 
                 <div class="word-bank" id="word-bank">

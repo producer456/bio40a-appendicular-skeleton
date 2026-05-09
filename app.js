@@ -21,77 +21,41 @@ const TARSALS = [
     'Cuboid'
 ];
 
-// Word banks shared between right & left tabs of the same bone
-const SCAPULA_WORDS = [
-    'Scapula',
-    'Superior border', 'Lateral (axillary) border', 'Medial (vertebral) border',
-    'Spine', 'Supraspinous fossa', 'Infraspinous fossa',
-    'Acromion', 'Coracoid process', 'Glenoid cavity'
-];
-const HUMERUS_ANT_WORDS = [
-    'Humerus',
-    'Head', 'Anatomical neck', 'Surgical neck',
-    'Greater tubercle', 'Lesser tubercle', 'Intertubercular sulcus',
-    'Deltoid tuberosity',
-    'Medial epicondyle', 'Lateral epicondyle',
-    'Coronoid fossa', 'Capitulum', 'Trochlea'
-];
-const HUMERUS_POST_WORDS = [
-    'Humerus',
-    'Head', 'Anatomical neck', 'Surgical neck',
-    'Greater tubercle', 'Deltoid tuberosity',
-    'Medial epicondyle', 'Lateral epicondyle',
-    'Olecranon fossa', 'Trochlea'
-];
-const OS_COXAE_WORDS = [
-    'Ilium', 'Ischium', 'Pubis',
-    ...ILIUM, ...ISCHIUM,
-    'Pubic symphysis',
-    'Obturator foramen', 'Acetabulum'
-];
-const FEMUR_ANT_WORDS = [
-    'Femur',
-    'Head', 'Neck', 'Greater trochanter', 'Lesser trochanter',
-    'Shaft/Body',
-    'Medial epicondyle', 'Lateral epicondyle',
-    'Medial condyle', 'Lateral condyle',
-    'Patellar surface'
-];
-const FEMUR_POST_WORDS = [
-    'Femur',
-    'Head', 'Neck', 'Greater trochanter', 'Lesser trochanter',
-    'Linea aspera', 'Shaft/Body',
-    'Medial epicondyle', 'Lateral epicondyle',
-    'Medial condyle', 'Lateral condyle',
-    'Intercondylar fossa', 'Popliteal surface'
-];
-const TIBIA_FIBULA_WORDS = [
-    'Patella', 'Tibia', 'Fibula',
-    'Medial condyle of tibia', 'Lateral condyle of tibia',
-    'Intercondylar eminence', 'Tibial tuberosity',
-    'Anterior crest', 'Medial malleolus',
-    'Head of fibula', 'Lateral malleolus'
-];
+// "Right"/"Left" included on starred bones — students place a marker
+// tagged with the side to answer the "siding" question from the lab packet.
+const SIDE_RL = ['Right', 'Left'];
 
 const IMAGE_DATA = {
-    // --- Scapula (R/L) ---
-    scapula_right: { src: 'images/scapula_right.jpg', title: 'Scapula — Right', words: SCAPULA_WORDS },
-    scapula_left:  { src: 'images/scapula_left.jpg',  title: 'Scapula — Left',  words: SCAPULA_WORDS },
-
-    // --- Clavicle ---
-    clavicle: {
-        src: 'images/clavicle.jpg',
-        title: 'Clavicle',
-        words: ['Clavicle', 'Acromial end', 'Sternal end']
+    pectoral_girdle: {
+        src: 'images/pectoral_girdle.jpg',
+        title: 'Pectoral Girdle (Clavicle)',
+        words: ['Clavicle', 'Acromial end', 'Sternal end', 'Scapula']
     },
-
-    // --- Humerus (R/L × Ant/Post) ---
-    humerus_anterior_right:  { src: 'images/humerus_anterior_right.jpg',  title: 'Humerus — R · Ant.',  words: HUMERUS_ANT_WORDS },
-    humerus_anterior_left:   { src: 'images/humerus_anterior_left.jpg',   title: 'Humerus — L · Ant.',  words: HUMERUS_ANT_WORDS },
-    humerus_posterior_right: { src: 'images/humerus_posterior_right.jpg', title: 'Humerus — R · Post.', words: HUMERUS_POST_WORDS },
-    humerus_posterior_left:  { src: 'images/humerus_posterior_left.jpg',  title: 'Humerus — L · Post.', words: HUMERUS_POST_WORDS },
-
-    // --- Radius & Ulna ---
+    scapula: {
+        src: 'images/scapula.jpg',
+        title: 'Scapula ★ (siding)',
+        words: [
+            ...SIDE_RL,
+            'Scapula',
+            'Superior border', 'Lateral (axillary) border', 'Medial (vertebral) border',
+            'Spine', 'Supraspinous fossa', 'Infraspinous fossa',
+            'Acromion', 'Coracoid process', 'Glenoid cavity'
+        ]
+    },
+    humerus: {
+        src: 'images/humerus.jpg',
+        title: 'Humerus ★ (siding)',
+        words: [
+            ...SIDE_RL,
+            'Humerus',
+            'Head', 'Anatomical neck', 'Surgical neck',
+            'Greater tubercle', 'Lesser tubercle', 'Intertubercular sulcus',
+            'Deltoid tuberosity',
+            'Medial epicondyle', 'Lateral epicondyle',
+            'Olecranon fossa', 'Coronoid fossa',
+            'Capitulum', 'Trochlea'
+        ]
+    },
     radius_ulna: {
         src: 'images/radius_ulna.jpg',
         title: 'Radius & Ulna',
@@ -102,10 +66,8 @@ const IMAGE_DATA = {
             'Head of ulna', 'Styloid process of ulna'
         ]
     },
-
-    // --- Wrist & Hand ---
-    wrist_hand: {
-        src: 'images/wrist_hand.jpg',
+    hand: {
+        src: 'images/hand.jpg',
         title: 'Wrist & Hand',
         words: [
             ...CARPALS,
@@ -114,12 +76,6 @@ const IMAGE_DATA = {
             'Proximal phalanx', 'Middle phalanx', 'Distal phalanx'
         ]
     },
-
-    // --- Os Coxae (R/L) ---
-    os_coxae_right: { src: 'images/os_coxae_right.jpg', title: 'Os Coxae — Right', words: OS_COXAE_WORDS },
-    os_coxae_left:  { src: 'images/os_coxae_left.jpg',  title: 'Os Coxae — Left',  words: OS_COXAE_WORDS },
-
-    // --- Pelvis (articulated; no R/L) ---
     pelvis_articulated: {
         src: 'images/pelvis_articulated.jpg',
         title: 'Pelvis — Articulated',
@@ -131,20 +87,44 @@ const IMAGE_DATA = {
             'True pelvis', 'False pelvis'
         ]
     },
-
-    // --- Femur (R/L × Ant/Post) ---
-    femur_anterior_right:  { src: 'images/femur_anterior_right.jpg',  title: 'Femur — R · Ant.',  words: FEMUR_ANT_WORDS },
-    femur_anterior_left:   { src: 'images/femur_anterior_left.jpg',   title: 'Femur — L · Ant.',  words: FEMUR_ANT_WORDS },
-    femur_posterior_right: { src: 'images/femur_posterior_right.jpg', title: 'Femur — R · Post.', words: FEMUR_POST_WORDS },
-    femur_posterior_left:  { src: 'images/femur_posterior_left.jpg',  title: 'Femur — L · Post.', words: FEMUR_POST_WORDS },
-
-    // --- Tibia / Fibula / Patella (R/L) ---
-    tibia_fibula_right: { src: 'images/tibia_fibula_right.jpg', title: 'Tibia/Fib/Patella — R', words: TIBIA_FIBULA_WORDS },
-    tibia_fibula_left:  { src: 'images/tibia_fibula_left.jpg',  title: 'Tibia/Fib/Patella — L', words: TIBIA_FIBULA_WORDS },
-
-    // --- Ankle & Foot ---
-    ankle_foot: {
-        src: 'images/ankle_foot.jpg',
+    os_coxae: {
+        src: 'images/os_coxae.jpg',
+        title: 'Os Coxae ★ (siding)',
+        words: [
+            ...SIDE_RL,
+            'Ilium', 'Ischium', 'Pubis',
+            ...ILIUM, ...ISCHIUM,
+            'Pubic symphysis',
+            'Obturator foramen', 'Acetabulum'
+        ]
+    },
+    femur: {
+        src: 'images/femur.jpg',
+        title: 'Femur ★ (siding)',
+        words: [
+            ...SIDE_RL,
+            'Femur',
+            'Head', 'Neck', 'Greater trochanter', 'Lesser trochanter',
+            'Linea aspera', 'Shaft/Body',
+            'Medial epicondyle', 'Lateral epicondyle',
+            'Medial condyle', 'Lateral condyle',
+            'Intercondylar fossa', 'Patellar surface', 'Popliteal surface'
+        ]
+    },
+    tibia_fibula: {
+        src: 'images/tibia_fibula.jpg',
+        title: 'Tibia & Fibula ★ (siding)',
+        words: [
+            ...SIDE_RL,
+            'Patella', 'Tibia', 'Fibula',
+            'Medial condyle of tibia', 'Lateral condyle of tibia',
+            'Intercondylar eminence', 'Tibial tuberosity',
+            'Anterior crest', 'Medial malleolus',
+            'Head of fibula', 'Lateral malleolus'
+        ]
+    },
+    foot: {
+        src: 'images/foot.jpg',
         title: 'Ankle & Foot',
         words: [
             ...TARSALS,
@@ -153,7 +133,6 @@ const IMAGE_DATA = {
             'Proximal phalanx', 'Middle phalanx', 'Distal phalanx'
         ]
     },
-
     terms_list: {
         pdf: 'terms_list.pdf',
         title: 'Week 5 Terms List (PDF)',
@@ -162,7 +141,7 @@ const IMAGE_DATA = {
 };
 
 let currentMode = 'teacher';
-let currentImage = 'scapula_right';
+let currentImage = 'pectoral_girdle';
 let markers = {};
 let answerKeys = {};
 let markerIdCounter = 0;
